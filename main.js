@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const yaml = require('js-yaml');
+const { config } = require('process');
 
 class ConfigLoader {
   constructor(configDir, env = 'dev') {
@@ -53,12 +54,29 @@ class ConfigLoader {
 
     const config = this.configs[this.currentNamespace];
 
-    if (!config.hasOwnProperty(configName)) {
-      throw new Error(`Config '${configName}' not found in namespace '${this.currentNamespace}'`);
+    if (!config.hasOwnProperty(`${configName}_${this.env}`)) {
+      if(!config.hasOwnProperty(configName)){
+        throw new Error(`Config '${configName}_${this.env}' or '${configName}' not found in namespace ${this.currentNamespace}`)
+      }else{
+        return config[configName]
+      }
     }
 
     return config[`${configName}_${this.env}`];
   }
+}
+
+const configLoader = new ConfigLoader('./config', 'dev');
+
+try {
+  console.log(configLoader.load('login_page'))
+  const loginUrl = configLoader.load('login_page').get('loginUrl');
+  console.log('Login URL:', loginUrl);
+
+  const formFields = configLoader.get('formFields');
+  console.log('Form Fields:', formFields);
+} catch (error) {
+  console.error(error.message);
 }
 
 

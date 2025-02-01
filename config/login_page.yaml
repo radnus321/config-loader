@@ -1,0 +1,5 @@
+loginUrl_dev: "https://dev.example.com/login"
+formFields:
+  username: "user"
+  password: "pass"
+
